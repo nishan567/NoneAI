@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -17,16 +18,37 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Grant Execute Permission
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Locate Project & Ensure Gradle Wrapper
+        run: |
+          # Automatically find directory containing settings.gradle.kts or build.gradle.kts
+          PROJECT_DIR=$(find . -maxdepth 3 -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          if [ -z "$PROJECT_DIR" ]; then
+            PROJECT_DIR="."
+          fi
+          echo "Detected project root at: $PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
+          cd "$PROJECT_DIR"
+          # If gradlew is missing, automatically generate it
+          if [ ! -f "gradlew" ]; then
+            echo "gradlew not found, generating Gradle wrapper..."
+            gradle wrapper --gradle-version 8.4
+          fi
+          chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          cd "$PROJECT_DIR"
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: NoneaAI-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
+          if-no-files-found: error
+          retention-days: 14
