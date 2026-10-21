@@ -50,9 +50,7 @@ jobs:
         run: |
           cd "$APP_DIR"
           echo "Building inside: $(pwd)"
-          gradle wrapper --gradle-version 8.7
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace -x test --no-build-cache
+          gradle assembleDebug --no-daemon --stacktrace -x test --no-build-cache
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
