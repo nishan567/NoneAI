@@ -49,8 +49,10 @@ jobs:
       - name: Build Debug APK
         run: |
           cd "$APP_DIR"
+          # Write local.properties so AGP directly resolves Android SDK path
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "Building inside: $(pwd)"
-          gradle assembleDebug --no-daemon --stacktrace -x test --no-build-cache
+          gradle assembleDebug --no-daemon --stacktrace --info -x test -x checkNoSecrets --no-build-cache
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
