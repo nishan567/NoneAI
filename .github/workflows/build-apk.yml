@@ -15,6 +15,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Extract Android App from Repo Archive
+        run: |
+          mkdir -p android_build
+          if [ -f "public/assets/aistudio/NoneaAI-v2_3-apps_96df31c7.zip" ]; then
+            echo "Extracting Android project from repository archive..."
+            unzip -q -o public/assets/aistudio/NoneaAI-v2_3-apps_96df31c7.zip -d android_build
+          fi
+          APP_DIR=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            echo "Error: Could not locate Android project root with settings.gradle.kts!"
+            exit 1
+          fi
+          echo "Found Android app in: $APP_DIR"
+          echo "APP_DIR=$APP_DIR" >> $GITHUB_ENV
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -32,13 +47,11 @@ jobs:
           cache-disabled: true
 
       - name: Build Debug APK
-        working-directory: sample_projects/NoneaAI
         run: |
-          echo "Building inside directory: $(pwd)"
-          # Generate Gradle 8.7 wrapper
+          cd "$APP_DIR"
+          echo "Building inside: $(pwd)"
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew
-          # Compile Debug APK
           ./gradlew assembleDebug --no-daemon --stacktrace -x test --no-build-cache
 
       - name: Upload Debug APK Artifact
