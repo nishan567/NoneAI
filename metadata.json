@@ -1,0 +1,7 @@
+{
+  "name": "NexusCode - AI Coding Workspace & Studio",
+  "description": "Full-featured AI coding assistant & workspace with syntax-highlighted editor, multi-language project generation, real Android project builder, error debugger, Git source control, build log viewer, and sandboxed terminal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

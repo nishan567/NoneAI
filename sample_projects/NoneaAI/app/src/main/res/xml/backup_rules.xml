@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and older: keep encrypted secrets out of backups (the Keystore key isn't backed up anyway). -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="nonea_secure.xml" />
+    <exclude domain="sharedpref" path="nonea_automation.xml" />
+</full-backup-content>
